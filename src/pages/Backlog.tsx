@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useTaskStore, Task, TaskPriority } from '@/stores/taskStore';
+import React, { useState, useEffect } from 'react';
+import { useTaskStore, Task, TaskStatus } from '@/stores/typedTaskStore';
 import { TaskDialog } from '@/components/dialogs/TaskDialog';
 import { Button } from '@/components/ui/button';
 import { 
@@ -21,20 +21,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from '@/hooks/use-toast';
 
 export default function Backlog() {
+  const { toast } = useToast();
   const tasks = useTaskStore((state) => state.tasks);
-  const moveTask = useTaskStore((state) => state.moveTask);
+  const moveTask = useTaskStore((state) => state.updateTask);
   const [selectedTask, setSelectedTask] = useState<Task | undefined>(undefined);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [dialogOpen, setDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
-  const backlogTasks = tasks.filter((task) => task.status === 'backlog');
+  const backlogTasks = tasks.filter((task) => task.status === TaskStatus.BACKLOG);
   
   const filteredTasks = backlogTasks.filter((task) => 
     task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    task.description.toLowerCase().includes(searchTerm.toLowerCase())
+    (task.description && task.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
   const handleTaskClick = (task: Task) => {
@@ -50,7 +52,11 @@ export default function Backlog() {
   };
   
   const handleMoveToBoard = (task: Task) => {
-    moveTask(task.id, 'todo');
+    moveTask(task.id, { status: TaskStatus.TODO });
+    toast({
+      title: "Task Moved",
+      description: `Task "${task.title}" moved to To Do column.`
+    });
   };
   
   return (

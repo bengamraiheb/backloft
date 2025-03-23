@@ -166,12 +166,12 @@ export default function Board() {
         <div className="flex gap-4 h-full">
           <div
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, 'backlog')}
+            onDrop={(e) => handleDrop(e, TaskStatus.BACKLOG)}
             className="h-full"
           >
             <Column
               title="Backlog"
-              status="backlog"
+              status={TaskStatus.BACKLOG}
               tasks={tasks}
               onTaskClick={handleTaskClick}
               onDragStart={handleDragStart}
@@ -179,12 +179,12 @@ export default function Board() {
           </div>
           <div
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, 'todo')}
+            onDrop={(e) => handleDrop(e, TaskStatus.TODO)}
             className="h-full"
           >
             <Column
               title="To Do"
-              status="todo"
+              status={TaskStatus.TODO}
               tasks={tasks}
               onTaskClick={handleTaskClick}
               onDragStart={handleDragStart}
@@ -192,12 +192,12 @@ export default function Board() {
           </div>
           <div
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, 'in-progress')}
+            onDrop={(e) => handleDrop(e, TaskStatus.IN_PROGRESS)}
             className="h-full"
           >
             <Column
               title="In Progress"
-              status="in-progress"
+              status={TaskStatus.IN_PROGRESS}
               tasks={tasks}
               onTaskClick={handleTaskClick}
               onDragStart={handleDragStart}
@@ -205,12 +205,12 @@ export default function Board() {
           </div>
           <div
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, 'done')}
+            onDrop={(e) => handleDrop(e, TaskStatus.DONE)}
             className="h-full"
           >
             <Column
               title="Done"
-              status="done"
+              status={TaskStatus.DONE}
               tasks={tasks}
               onTaskClick={handleTaskClick}
               onDragStart={handleDragStart}
