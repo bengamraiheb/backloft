@@ -21,7 +21,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PriorityBadge } from '@/components/ui/PriorityBadge';
-import { TaskStatus, TaskPriority, Task, User, useTaskStore } from '@/stores/taskStore';
+import { TaskStatus, TaskPriority, User } from '@/stores/typedTaskStore';
 import { 
   Calendar, 
   MessageSquare, 
@@ -31,26 +31,27 @@ import {
   Trash2 
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { TaskCompatible } from '@/types/task';
 
 interface TaskDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  task?: Task;
+  task?: TaskCompatible;
   mode: 'view' | 'edit' | 'create';
 }
 
-const statusOptions: { value: TaskStatus; label: string }[] = [
-  { value: 'backlog', label: 'Backlog' },
-  { value: 'todo', label: 'To Do' },
-  { value: 'in-progress', label: 'In Progress' },
-  { value: 'done', label: 'Done' }
+const statusOptions: { value: string; label: string }[] = [
+  { value: TaskStatus.BACKLOG, label: 'Backlog' },
+  { value: TaskStatus.TODO, label: 'To Do' },
+  { value: TaskStatus.IN_PROGRESS, label: 'In Progress' },
+  { value: TaskStatus.DONE, label: 'Done' }
 ];
 
-const priorityOptions: { value: TaskPriority; label: string }[] = [
-  { value: 'low', label: 'Low' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'High' },
-  { value: 'urgent', label: 'Urgent' }
+const priorityOptions: { value: string; label: string }[] = [
+  { value: TaskPriority.LOW, label: 'Low' },
+  { value: TaskPriority.MEDIUM, label: 'Medium' },
+  { value: TaskPriority.HIGH, label: 'High' },
+  { value: TaskPriority.URGENT, label: 'Urgent' }
 ];
 
 export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) {

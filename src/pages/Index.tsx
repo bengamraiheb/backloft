@@ -84,8 +84,8 @@ export default function Index() {
       } : undefined,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
-      comments: task.comments
-    } as TaskCompatible;
+      comments: task.comments || []
+    };
   };
   
   return (
