@@ -1,4 +1,3 @@
-
 import nodemailer from 'nodemailer';
 
 // Configure transporter
@@ -12,7 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Send password reset email
+// Send password reset email with link
 export const sendResetPasswordEmail = async (
   to: string,
   name: string,
@@ -46,6 +45,42 @@ export const sendResetPasswordEmail = async (
   } catch (error) {
     console.error('Error sending password reset email:', error);
     throw new Error('Failed to send password reset email');
+  }
+};
+
+// Send password reset OTP email
+export const sendPasswordResetOTPEmail = async (
+  to: string,
+  name: string,
+  otp: string
+) => {
+  const mailOptions = {
+    from: `"Jira Clone" <${process.env.EMAIL_FROM}>`,
+    to,
+    subject: 'Password Reset Code',
+    html: `
+      <div>
+        <h1>Password Reset Verification Code</h1>
+        <p>Hi ${name},</p>
+        <p>You requested to reset your password. Use the verification code below to complete the process:</p>
+        <div style="text-align: center; margin: 20px 0;">
+          <div style="font-size: 24px; letter-spacing: 8px; font-weight: bold; background-color: #f2f2f2; padding: 15px; border-radius: 4px; display: inline-block;">
+            ${otp}
+          </div>
+        </div>
+        <p>This code is valid for 10 minutes. If you didn't request this, please ignore this email.</p>
+        <p>Thank you,</p>
+        <p>Jira Clone Team</p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Password reset OTP email sent to ${to}`);
+  } catch (error) {
+    console.error('Error sending password reset OTP email:', error);
+    throw new Error('Failed to send password reset OTP email');
   }
 };
 

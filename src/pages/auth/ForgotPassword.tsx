@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -34,9 +35,11 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function ForgotPassword() {
-  const { requestPasswordReset } = useAuth();
+  const { requestPasswordReset, requestPasswordResetOTP } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("otp");
+  const navigate = useNavigate();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,8 +51,15 @@ export default function ForgotPassword() {
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      await requestPasswordReset(data.email);
-      setIsSuccess(true);
+      
+      if (activeTab === "otp") {
+        await requestPasswordResetOTP(data.email);
+        navigate(`/verify-otp?email=${encodeURIComponent(data.email)}`);
+      } else {
+        await requestPasswordReset(data.email);
+        setIsSuccess(true);
+      }
+      
       form.reset();
     } catch (error) {
       console.error("Password reset request error:", error);
@@ -64,17 +74,35 @@ export default function ForgotPassword() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Forgot Password</CardTitle>
           <CardDescription className="text-center">
-            Enter your email address and we'll send you a link to reset your password
+            Choose how you want to reset your password
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {isSuccess && (
+          <Tabs defaultValue="otp" className="mb-4" onValueChange={(value) => setActiveTab(value)}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="otp">Verification Code</TabsTrigger>
+              <TabsTrigger value="link">Email Link</TabsTrigger>
+            </TabsList>
+            <TabsContent value="otp" className="py-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                We'll send a 6-digit verification code to your email that you'll need to enter on the next screen.
+              </p>
+            </TabsContent>
+            <TabsContent value="link" className="py-4">
+              <p className="text-sm text-muted-foreground mb-4">
+                We'll send a password reset link to your email that you can use to set a new password.
+              </p>
+            </TabsContent>
+          </Tabs>
+
+          {isSuccess && activeTab === "link" && (
             <Alert className="mb-4 bg-green-50 text-green-800 border-green-200">
               <AlertDescription>
                 If an account exists with that email, we've sent password reset instructions.
               </AlertDescription>
             </Alert>
           )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -97,7 +125,7 @@ export default function ForgotPassword() {
                     Sending...
                   </>
                 ) : (
-                  "Send Reset Link"
+                  activeTab === "otp" ? "Send Verification Code" : "Send Reset Link"
                 )}
               </Button>
             </form>

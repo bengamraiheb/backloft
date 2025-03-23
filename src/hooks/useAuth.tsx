@@ -20,6 +20,8 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
+  requestPasswordResetOTP: (email: string) => Promise<void>;
+  verifyPasswordResetOTP: (email: string, otp: string) => Promise<string>;
   resetPassword: (password: string, token: string) => Promise<void>;
 }
 
@@ -99,6 +101,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const requestPasswordResetOTP = async (email: string) => {
+    try {
+      setIsLoading(true);
+      await authService.resetPasswordRequestOTP(email);
+      toast.success('Verification code sent to your email.');
+    } catch (error) {
+      console.error('Password reset OTP request error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyPasswordResetOTP = async (email: string, otp: string) => {
+    try {
+      setIsLoading(true);
+      const response = await authService.verifyPasswordResetOTP(email, otp);
+      toast.success('Verification successful. Please set a new password.');
+      return response.resetToken;
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const resetPassword = async (password: string, token: string) => {
     try {
       setIsLoading(true);
@@ -123,6 +152,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         register,
         logout,
         requestPasswordReset,
+        requestPasswordResetOTP,
+        verifyPasswordResetOTP,
         resetPassword,
       }}
     >

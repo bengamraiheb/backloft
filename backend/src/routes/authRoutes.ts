@@ -6,7 +6,9 @@ import {
   refreshToken, 
   logout,
   requestPasswordReset,
-  resetPassword
+  resetPassword,
+  requestPasswordResetOTP,
+  verifyPasswordResetOTP
 } from '../controllers/authController';
 import { validate, schemas } from '../middleware/validation';
 
@@ -149,5 +151,58 @@ router.post('/reset-password-request', validate(schemas.resetPasswordSchema), re
  *         description: Invalid or expired token
  */
 router.post('/reset-password', validate(schemas.newPasswordSchema), resetPassword);
+
+/**
+ * @swagger
+ * /api/auth/reset-password-otp-request:
+ *   post:
+ *     summary: Request password reset with OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset OTP sent
+ *       404:
+ *         description: User not found
+ */
+router.post('/reset-password-otp-request', validate(schemas.resetPasswordSchema), requestPasswordResetOTP);
+
+/**
+ * @swagger
+ * /api/auth/verify-reset-otp:
+ *   post:
+ *     summary: Verify password reset OTP
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - otp
+ *             properties:
+ *               email:
+ *                 type: string
+ *               otp:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: OTP verified successfully
+ *       400:
+ *         description: Invalid or expired OTP
+ */
+router.post('/verify-reset-otp', verifyPasswordResetOTP);
 
 export default router;

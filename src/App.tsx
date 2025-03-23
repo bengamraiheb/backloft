@@ -20,6 +20,7 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
+import VerifyOTP from "@/pages/auth/VerifyOTP";
 import Unauthorized from "@/pages/Unauthorized";
 
 // Auth
@@ -57,6 +58,7 @@ const App = () => {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/verify-otp" element={<VerifyOTP />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                 <Route path="/unauthorized" element={<Unauthorized />} />
                 
