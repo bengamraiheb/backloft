@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
 import { Task } from '@/stores/typedTaskStore';
+import { TaskCompatible } from '@/types/task';
 
 export default function Backlog() {
   const { toast } = useToast();
@@ -57,6 +58,14 @@ export default function Backlog() {
       title: "Task Moved",
       description: `Task "${task.title}" moved to To Do column.`
     });
+  };
+
+  const adaptTaskForDialog = (task: Task): TaskCompatible => {
+    return {
+      ...task,
+      description: task.description || '',
+      comments: task.comments || []
+    } as TaskCompatible;
   };
   
   return (
@@ -178,7 +187,7 @@ export default function Backlog() {
       <TaskDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        task={selectedTask}
+        task={selectedTask ? adaptTaskForDialog(selectedTask) : undefined}
         mode={dialogMode}
       />
     </div>

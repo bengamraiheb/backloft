@@ -14,6 +14,7 @@ import {
   BarChart2, 
   ClipboardList 
 } from 'lucide-react';
+import { TaskBase, TaskCompatible } from '@/types/task';
 
 export default function Index() {
   const tasks = useTaskStore((state) => state.tasks);
@@ -38,6 +39,31 @@ export default function Index() {
     return [...tasks]
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
       .slice(0, 5);
+  };
+
+  // Convert taskStore Task to the format expected by TaskCard
+  const adaptTaskForDisplay = (task: Task): TaskBase => {
+    return {
+      ...task,
+      creatorId: task.assignee?.id || 'unknown', // Use assignee ID as a fallback for creatorId
+      status: task.status,
+      priority: task.priority,
+      createdAt: task.createdAt.toISOString(),
+      updatedAt: task.updatedAt.toISOString(),
+      comments: task.comments
+    };
+  };
+
+  // Type adapter function to ensure compatibility with the task dialog
+  const adaptTaskForDialog = (task: Task): TaskCompatible => {
+    return {
+      ...task,
+      creatorId: task.assignee?.id || 'unknown',
+      creator: task.assignee,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+      comments: task.comments
+    } as TaskCompatible;
   };
   
   return (
@@ -133,7 +159,7 @@ export default function Index() {
                   {getRecentTasks().map((task) => (
                     <TaskCard 
                       key={task.id} 
-                      task={task} 
+                      task={adaptTaskForDisplay(task)} 
                       onClick={() => handleTaskClick(task)}
                     />
                   ))}
@@ -231,7 +257,7 @@ export default function Index() {
       <TaskDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        task={selectedTask}
+        task={selectedTask ? adaptTaskForDialog(selectedTask) : undefined}
         mode="view"
       />
     </div>

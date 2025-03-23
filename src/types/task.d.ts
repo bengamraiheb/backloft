@@ -26,4 +26,31 @@ export interface TaskBase {
   };
   createdAt: string;
   updatedAt: string;
+  comments?: any[]; // Add comments to ensure compatibility between task types
 }
+
+// Add a utility type to help with conversions between task store types
+export type TaskCompatible = {
+  id: string;
+  title: string;
+  description: string; // Required for taskStore.Task compatibility
+  status: string;
+  priority: string;
+  assigneeId?: string | null;
+  assignee?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  } | null;
+  creatorId: string;
+  creator?: {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+  };
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  comments: any[];
+};

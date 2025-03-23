@@ -14,8 +14,9 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, onClick, className }: TaskCardProps) {
-  // Handle both task models by using an optional 'comments' array
-  const comments = 'comments' in task ? task.comments : [];
+  // Handle both task models by using a type-safe approach to check for comments
+  const hasComments = 'comments' in task && Array.isArray(task.comments);
+  const comments = hasComments ? (task.comments as any[]) : [];
   
   return (
     <div 

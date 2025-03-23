@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTaskStore, TaskStatus, TaskPriority } from '@/stores/typedTaskStore';
 import { useSocket } from '@/hooks/useSocket';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Task } from '@/stores/typedTaskStore';
+import { TaskCompatible } from '@/types/task';
 
 export default function Board() {
   const { toast } = useToast();
@@ -131,6 +133,15 @@ export default function Board() {
       description: 'Task board has been refreshed.',
     });
   };
+
+  // Type adapter function to ensure compatibility with the task dialog
+  const adaptTaskForDialog = (task: Task): TaskCompatible => {
+    return {
+      ...task,
+      description: task.description || '',
+      comments: task.comments || []
+    } as TaskCompatible;
+  };
   
   if (error) {
     return (
@@ -221,7 +232,7 @@ export default function Board() {
       <TaskDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        task={selectedTask}
+        task={selectedTask ? adaptTaskForDialog(selectedTask) : undefined}
         mode={dialogMode}
       />
     </div>
