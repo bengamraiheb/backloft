@@ -10,7 +10,7 @@ import {
   PlusCircle, 
   CheckCircle2, 
   Clock, 
-  Trending,
+  TrendingUp,
   BarChart2, 
   ClipboardList 
 } from 'lucide-react';
