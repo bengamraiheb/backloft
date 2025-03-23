@@ -17,6 +17,7 @@ export function TaskCard({ task, onClick, className }: TaskCardProps) {
   // Handle both task models by using a type-safe approach to check for comments
   const hasComments = 'comments' in task && Array.isArray(task.comments);
   const comments = hasComments ? (task.comments as any[]) : [];
+  const commentCount = comments ? comments.length : 0;
   
   return (
     <div 
@@ -53,10 +54,10 @@ export function TaskCard({ task, onClick, className }: TaskCardProps) {
             </div>
           )}
           
-          {comments.length > 0 && (
+          {commentCount > 0 && (
             <div className="flex items-center text-xs text-muted-foreground">
               <MessageSquare size={14} className="mr-1" />
-              {comments.length}
+              {commentCount}
             </div>
           )}
         </div>

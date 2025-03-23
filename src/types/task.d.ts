@@ -8,8 +8,8 @@ export interface TaskBase {
   id: string;
   title: string;
   description?: string;  // Make description optional to match both interfaces
-  status: string;
-  priority: string;
+  status: TaskStatus | string;  // Accept both enum and string for flexibility
+  priority: TaskPriority | string;
   assigneeId?: string | null;
   assignee?: {
     id: string;
@@ -34,8 +34,8 @@ export type TaskCompatible = {
   id: string;
   title: string;
   description: string; // Required for taskStore.Task compatibility
-  status: string;
-  priority: string;
+  status: TaskStatus | string;
+  priority: TaskPriority | string;
   assigneeId?: string | null;
   assignee?: {
     id: string;

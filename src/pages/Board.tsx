@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTaskStore, TaskStatus, TaskPriority } from '@/stores/typedTaskStore';
 import { useSocket } from '@/hooks/useSocket';
@@ -22,7 +21,6 @@ export default function Board() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { socket } = useSocket();
   
-  // Fetch tasks on component mount
   useEffect(() => {
     fetchTasks().catch(err => {
       console.error('Error fetching tasks:', err);
@@ -34,7 +32,6 @@ export default function Board() {
     });
   }, [fetchTasks, toast]);
   
-  // Handle socket events
   useEffect(() => {
     if (!socket) return;
     
@@ -134,11 +131,12 @@ export default function Board() {
     });
   };
 
-  // Type adapter function to ensure compatibility with the task dialog
   const adaptTaskForDialog = (task: Task): TaskCompatible => {
     return {
       ...task,
       description: task.description || '',
+      status: task.status as TaskStatus,
+      priority: task.priority as TaskPriority,
       comments: task.comments || []
     } as TaskCompatible;
   };

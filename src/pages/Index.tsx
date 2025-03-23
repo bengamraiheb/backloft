@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { useTaskStore, Task, TaskStatus } from '@/stores/taskStore';
+import { useTaskStore, Task, TaskStatus, TaskPriority } from '@/stores/taskStore';
 import { Link } from 'react-router-dom';
 import { TaskDialog } from '@/components/dialogs/TaskDialog';
 import { Button } from '@/components/ui/button';
@@ -41,25 +40,48 @@ export default function Index() {
       .slice(0, 5);
   };
 
-  // Convert taskStore Task to the format expected by TaskCard
   const adaptTaskForDisplay = (task: Task): TaskBase => {
     return {
-      ...task,
-      creatorId: task.assignee?.id || 'unknown', // Use assignee ID as a fallback for creatorId
+      id: task.id,
+      title: task.title,
+      description: task.description,
       status: task.status,
       priority: task.priority,
+      assigneeId: task.assignee?.id,
+      assignee: task.assignee ? {
+        id: task.assignee.id,
+        name: task.assignee.name,
+        email: task.assignee.id + '@example.com',
+        avatar: task.assignee.avatar
+      } : null,
+      creatorId: task.assignee?.id || 'unknown',
       createdAt: task.createdAt.toISOString(),
       updatedAt: task.updatedAt.toISOString(),
       comments: task.comments
     };
   };
 
-  // Type adapter function to ensure compatibility with the task dialog
   const adaptTaskForDialog = (task: Task): TaskCompatible => {
     return {
-      ...task,
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      assigneeId: task.assignee?.id,
+      assignee: task.assignee ? {
+        id: task.assignee.id,
+        name: task.assignee.name,
+        email: task.assignee.id + '@example.com',
+        avatar: task.assignee.avatar
+      } : null,
       creatorId: task.assignee?.id || 'unknown',
-      creator: task.assignee,
+      creator: task.assignee ? {
+        id: task.assignee.id,
+        name: task.assignee.name,
+        email: task.assignee.id + '@example.com',
+        avatar: task.assignee.avatar
+      } : undefined,
       createdAt: task.createdAt,
       updatedAt: task.updatedAt,
       comments: task.comments

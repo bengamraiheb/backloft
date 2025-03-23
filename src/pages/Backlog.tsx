@@ -64,6 +64,8 @@ export default function Backlog() {
     return {
       ...task,
       description: task.description || '',
+      status: task.status as TaskStatus,
+      priority: task.priority as TaskPriority,
       comments: task.comments || []
     } as TaskCompatible;
   };
