@@ -224,14 +224,14 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
                   Assignee
                 </label>
                 <Select
-                  value={formData.assigneeId || ''}
-                  onValueChange={(value) => handleSelectChange('assigneeId', value)}
+                  value={formData.assigneeId || 'unassigned'}
+                  onValueChange={(value) => handleSelectChange('assigneeId', value === 'unassigned' ? null : value)}
                 >
                   <SelectTrigger id="assignee">
                     <SelectValue placeholder="Unassigned" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Unassigned</SelectItem>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
                     {users.map((user) => (
                       <SelectItem key={user.id} value={user.id}>
                         <div className="flex items-center gap-2">
