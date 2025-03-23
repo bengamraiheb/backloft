@@ -1,5 +1,5 @@
 
-# Jira Clone Backend
+# Gestionnaire Backend
 
 A backend REST API for a Jira clone application built with Node.js, Express, Prisma and PostgreSQL.
 
