@@ -34,8 +34,8 @@ export type TaskCompatible = {
   id: string;
   title: string;
   description: string; // Required for taskStore.Task compatibility
-  status: TaskStatus | string;
-  priority: TaskPriority | string;
+  status: string;
+  priority: string;
   assigneeId?: string | null;
   assignee?: {
     id: string;
@@ -43,7 +43,7 @@ export type TaskCompatible = {
     email: string;
     avatar?: string;
   } | null;
-  creatorId: string;
+  creatorId?: string;
   creator?: {
     id: string;
     name: string;

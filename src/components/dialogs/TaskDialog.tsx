@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Dialog, 
@@ -21,7 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PriorityBadge } from '@/components/ui/PriorityBadge';
-import { TaskStatus, TaskPriority, User } from '@/stores/typedTaskStore';
+import { TaskStatus, TaskPriority, User, useTaskStore } from '@/stores/typedTaskStore';
 import { 
   Calendar, 
   MessageSquare, 
@@ -63,14 +62,14 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
   const [formData, setFormData] = useState<{
     title: string;
     description: string;
-    status: TaskStatus;
-    priority: TaskPriority;
+    status: string;
+    priority: string;
     assigneeId: string | null;
   }>({
     title: task?.title || '',
     description: task?.description || '',
-    status: task?.status || 'todo',
-    priority: task?.priority || 'medium',
+    status: task?.status || TaskStatus.TODO,
+    priority: task?.priority || TaskPriority.MEDIUM,
     assigneeId: task?.assignee?.id || null,
   });
   
@@ -197,7 +196,7 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
                   <Select
                     value={formData.priority}
                     onValueChange={(value) => 
-                      handleSelectChange('priority', value as TaskPriority)
+                      handleSelectChange('priority', value)
                     }
                   >
                     <SelectTrigger id="priority">
@@ -351,7 +350,7 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock size={14} />
                       <span>
-                        {task && format(new Date(task.updatedAt), 'MMM d, yyyy h:mm a')}
+                        {task && format(new Date(task.updatedAt), 'MMM d, h:mm a')}
                       </span>
                     </div>
                   </div>
