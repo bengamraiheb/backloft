@@ -1,70 +1,82 @@
 
 import nodemailer from 'nodemailer';
 
+// Configure transporter
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT),
-  secure: Number(process.env.EMAIL_PORT) === 465,
+  secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
+// Send password reset email
 export const sendResetPasswordEmail = async (
-  email: string,
+  to: string,
   name: string,
   resetUrl: string
 ) => {
   const mailOptions = {
     from: `"Jira Clone" <${process.env.EMAIL_FROM}>`,
-    to: email,
-    subject: 'Password Reset Request',
+    to,
+    subject: 'Password Reset',
     html: `
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-        <h2>Hello ${name},</h2>
-        <p>You requested a password reset for your Jira Clone account.</p>
-        <p>Please click the button below to reset your password:</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" style="background-color: #0052cc; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Reset Password</a>
-        </div>
-        <p>If you didn't request this, please ignore this email and your password will remain unchanged.</p>
+      <div>
+        <h1>Password Reset Request</h1>
+        <p>Hi ${name},</p>
+        <p>You requested to reset your password. Click the link below to set a new password:</p>
+        <p>
+          <a href="${resetUrl}" style="background-color: #0052cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            Reset Password
+          </a>
+        </p>
+        <p>If you didn't request this, please ignore this email.</p>
         <p>This link is valid for 1 hour.</p>
-        <p>Thank you,<br>The Jira Clone Team</p>
+        <p>Thank you,</p>
+        <p>Jira Clone Team</p>
       </div>
     `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
+    console.log(`Password reset email sent to ${to}`);
   } catch (error) {
-    console.error('Error sending email:', error);
-    throw new Error('Failed to send reset email');
+    console.error('Error sending password reset email:', error);
+    throw new Error('Failed to send password reset email');
   }
 };
 
-export const sendWelcomeEmail = async (email: string, name: string) => {
+// Send welcome email
+export const sendWelcomeEmail = async (to: string, name: string) => {
   const mailOptions = {
     from: `"Jira Clone" <${process.env.EMAIL_FROM}>`,
-    to: email,
+    to,
     subject: 'Welcome to Jira Clone',
     html: `
-      <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
-        <h2>Welcome to Jira Clone, ${name}!</h2>
-        <p>Thank you for creating an account.</p>
-        <p>You can now start creating and managing tasks.</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${process.env.CLIENT_URL}" style="background-color: #0052cc; color: white; padding: 12px 20px; text-decoration: none; border-radius: 4px; font-weight: bold;">Get Started</a>
-        </div>
-        <p>Thank you,<br>The Jira Clone Team</p>
+      <div>
+        <h1>Welcome to Jira Clone!</h1>
+        <p>Hi ${name},</p>
+        <p>Thank you for joining Jira Clone. We're excited to have you on board.</p>
+        <p>
+          <a href="${process.env.CLIENT_URL}" style="background-color: #0052cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">
+            Go to Dashboard
+          </a>
+        </p>
+        <p>If you have any questions, feel free to contact us.</p>
+        <p>Thank you,</p>
+        <p>Jira Clone Team</p>
       </div>
     `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
+    console.log(`Welcome email sent to ${to}`);
   } catch (error) {
     console.error('Error sending welcome email:', error);
-    // Just log the error but don't throw - welcome email is not critical
+    throw new Error('Failed to send welcome email');
   }
 };

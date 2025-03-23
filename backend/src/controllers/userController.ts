@@ -1,10 +1,10 @@
 
 import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
 import { AuthenticatedRequest } from '../types';
 import prisma from '../config/db';
-import bcrypt from 'bcrypt';
 
-// Get current user
+// Get current user profile
 export const getCurrentUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -38,6 +38,10 @@ export const getCurrentUser = async (req: AuthenticatedRequest, res: Response) =
 // Get all users (admin only)
 export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -47,6 +51,9 @@ export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
         avatar: true,
         createdAt: true,
         updatedAt: true
+      },
+      orderBy: {
+        name: 'asc'
       }
     });
     
@@ -89,32 +96,40 @@ export const getUserById = async (req: Request, res: Response) => {
 // Update user
 export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    
     const { id } = req.params;
     const { name, email, role } = req.body;
     
     // Check if user exists
-    const userExists = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id }
     });
     
-    if (!userExists) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Check if user is updating their own profile or is an admin
-    if (req.user?.id !== id && req.user?.role !== 'ADMIN') {
-      return res.status(403).json({ message: 'Forbidden: Cannot update other users' });
+    // Check if user is admin or updating their own profile
+    if (req.user.id !== id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Forbidden: Not authorized to update this user' });
     }
     
-    // Only admins can update roles
-    const updateData: any = {};
-    if (name) updateData.name = name;
-    if (email) updateData.email = email;
-    if (role && req.user?.role === 'ADMIN') updateData.role = role;
+    // Only admin can update roles
+    if (role && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Forbidden: Only admin can update user roles' });
+    }
     
+    // Update user
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: updateData,
+      data: {
+        name: name !== undefined ? name : undefined,
+        email: email !== undefined ? email : undefined,
+        role: role !== undefined ? role : undefined
+      },
       select: {
         id: true,
         name: true,
@@ -126,9 +141,9 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
       }
     });
     
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'User updated successfully',
-      user: updatedUser 
+      user: updatedUser
     });
   } catch (error) {
     console.error('Update user error:', error);
@@ -139,22 +154,27 @@ export const updateUser = async (req: AuthenticatedRequest, res: Response) => {
 // Delete user
 export const deleteUser = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Not authenticated' });
+    }
+    
     const { id } = req.params;
     
     // Check if user exists
-    const userExists = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id }
     });
     
-    if (!userExists) {
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Only admin can delete users or users can delete themselves
-    if (req.user?.id !== id && req.user?.role !== 'ADMIN') {
-      return res.status(403).json({ message: 'Forbidden: Cannot delete other users' });
+    // Check if user is admin or deleting their own account
+    if (req.user.id !== id && req.user.role !== 'ADMIN') {
+      return res.status(403).json({ message: 'Forbidden: Not authorized to delete this user' });
     }
     
+    // Delete user
     await prisma.user.delete({
       where: { id }
     });
@@ -184,7 +204,7 @@ export const updatePassword = async (req: AuthenticatedRequest, res: Response) =
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Verify current password
+    // Validate current password
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     
     if (!isPasswordValid) {

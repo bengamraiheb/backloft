@@ -2,9 +2,10 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../types';
 import prisma from '../config/db';
+import { io } from '../server';
 
-// Get user notifications
-export const getUserNotifications = async (req: AuthenticatedRequest, res: Response) => {
+// Get all notifications for the current user
+export const getNotifications = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -14,6 +15,9 @@ export const getUserNotifications = async (req: AuthenticatedRequest, res: Respo
       where: {
         userId: req.user.id
       },
+      orderBy: {
+        createdAt: 'desc'
+      },
       include: {
         task: {
           select: {
@@ -21,9 +25,6 @@ export const getUserNotifications = async (req: AuthenticatedRequest, res: Respo
             title: true
           }
         }
-      },
-      orderBy: {
-        createdAt: 'desc'
       }
     });
     
@@ -34,7 +35,7 @@ export const getUserNotifications = async (req: AuthenticatedRequest, res: Respo
   }
 };
 
-// Mark notification as read
+// Mark a notification as read
 export const markNotificationAsRead = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -78,14 +79,13 @@ export const markAllNotificationsAsRead = async (req: AuthenticatedRequest, res:
       return res.status(401).json({ message: 'Not authenticated' });
     }
     
+    // Update all unread notifications
     await prisma.notification.updateMany({
       where: {
         userId: req.user.id,
         isRead: false
       },
-      data: {
-        isRead: true
-      }
+      data: { isRead: true }
     });
     
     res.status(200).json({ message: 'All notifications marked as read' });
@@ -95,7 +95,7 @@ export const markAllNotificationsAsRead = async (req: AuthenticatedRequest, res:
   }
 };
 
-// Delete notification
+// Delete a notification
 export const deleteNotification = async (req: AuthenticatedRequest, res: Response) => {
   try {
     if (!req.user) {
@@ -121,7 +121,7 @@ export const deleteNotification = async (req: AuthenticatedRequest, res: Respons
       where: { id }
     });
     
-    res.status(200).json({ message: 'Notification deleted successfully' });
+    res.status(200).json({ message: 'Notification deleted' });
   } catch (error) {
     console.error('Delete notification error:', error);
     res.status(500).json({ message: 'Server error' });

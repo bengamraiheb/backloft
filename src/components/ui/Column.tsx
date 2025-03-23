@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { TaskStatus, Task } from '@/stores/taskStore';
+import { TaskStatus, Task } from '@/stores/typedTaskStore';
 import { TaskCard } from './TaskCard';
 
 interface ColumnProps {
@@ -9,10 +9,18 @@ interface ColumnProps {
   status: TaskStatus;
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  onDragStart?: (e: React.DragEvent<HTMLDivElement>, task: Task) => void;
   className?: string;
 }
 
-export function Column({ title, status, tasks, onTaskClick, className }: ColumnProps) {
+export function Column({ 
+  title, 
+  status, 
+  tasks, 
+  onTaskClick,
+  onDragStart,
+  className 
+}: ColumnProps) {
   const filteredTasks = tasks.filter((task) => task.status === status);
   
   return (
@@ -34,11 +42,16 @@ export function Column({ title, status, tasks, onTaskClick, className }: ColumnP
       <div className="flex-1 p-2 overflow-y-auto space-y-2 min-h-[200px]">
         {filteredTasks.length > 0 ? (
           filteredTasks.map((task) => (
-            <TaskCard
+            <div
               key={task.id}
-              task={task}
-              onClick={() => onTaskClick(task)}
-            />
+              draggable={true}
+              onDragStart={(e) => onDragStart && onDragStart(e, task)}
+            >
+              <TaskCard
+                task={task}
+                onClick={() => onTaskClick(task)}
+              />
+            </div>
           ))
         ) : (
           <div className="h-full flex items-center justify-center">

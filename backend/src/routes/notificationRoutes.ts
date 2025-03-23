@@ -1,7 +1,7 @@
 
 import express from 'express';
 import {
-  getUserNotifications,
+  getNotifications,
   markNotificationAsRead,
   markAllNotificationsAsRead,
   deleteNotification
@@ -20,9 +20,9 @@ const router = express.Router();
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: List of user notifications
+ *         description: List of notifications
  */
-router.get('/', authenticate, getUserNotifications);
+router.get('/', authenticate, getNotifications);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.patch('/read-all', authenticate, markAllNotificationsAsRead);
  *           type: string
  *     responses:
  *       200:
- *         description: Notification deleted successfully
+ *         description: Notification deleted
  *       404:
  *         description: Notification not found
  */
