@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Dialog, 
@@ -20,7 +21,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { PriorityBadge } from '@/components/ui/PriorityBadge';
-import { TaskStatus, TaskPriority, User, useTaskStore } from '@/stores/typedTaskStore';
+import { TaskStatus, TaskPriority, useTaskStore } from '@/stores/typedTaskStore';
+import { useTaskStore as useLocalTaskStore } from '@/stores/taskStore'; // Import the local task store for users
 import { 
   Calendar, 
   MessageSquare, 
@@ -54,8 +56,10 @@ const priorityOptions: { value: string; label: string }[] = [
 ];
 
 export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) {
-  const users = useTaskStore((state) => state.users);
-  const { addTask, updateTask, deleteTask, addComment } = useTaskStore();
+  // Use the local task store for users data
+  const users = useLocalTaskStore((state) => state.users);
+  // Use typed task store for task operations
+  const { createTask, updateTask, deleteTask, addComment } = useTaskStore();
   const [isEditing, setIsEditing] = useState(mode !== 'view');
   const [commentText, setCommentText] = useState('');
   
@@ -73,7 +77,8 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
     assigneeId: task?.assignee?.id || null,
   });
   
-  const currentUser = users[0]; // For demo
+  // For demo purposes, use the first user
+  const currentUser = users[0]; 
   
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -92,12 +97,12 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
       : null;
     
     if (mode === 'create' || !task) {
-      addTask({
+      createTask({
         title: formData.title,
         description: formData.description,
         status: formData.status,
         priority: formData.priority,
-        assignee
+        assigneeId: formData.assigneeId
       });
     } else {
       updateTask(task.id, {
@@ -105,7 +110,7 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
         description: formData.description,
         status: formData.status,
         priority: formData.priority,
-        assignee
+        assigneeId: formData.assigneeId
       });
     }
     
@@ -124,7 +129,7 @@ export function TaskDialog({ open, onOpenChange, task, mode }: TaskDialogProps) 
   
   const handleAddComment = () => {
     if (task && commentText.trim()) {
-      addComment(task.id, commentText, currentUser);
+      addComment(task.id, commentText);
       setCommentText('');
     }
   };
