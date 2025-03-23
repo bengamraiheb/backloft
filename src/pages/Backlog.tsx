@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { useTaskStore, Task, TaskStatus } from '@/stores/typedTaskStore';
+import { useTaskStore, TaskStatus, TaskPriority } from '@/stores/typedTaskStore';
 import { TaskDialog } from '@/components/dialogs/TaskDialog';
 import { Button } from '@/components/ui/button';
 import { 
@@ -22,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from '@/hooks/use-toast';
+import { Task } from '@/stores/typedTaskStore';
 
 export default function Backlog() {
   const { toast } = useToast();
@@ -108,7 +108,7 @@ export default function Backlog() {
                     {task.title}
                   </div>
                   <div className="col-span-3">
-                    <PriorityBadge priority={task.priority} />
+                    <PriorityBadge priority={task.priority.toLowerCase()} />
                   </div>
                   <div className="col-span-2">
                     {task.assignee ? (

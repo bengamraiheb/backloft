@@ -1,19 +1,22 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Task } from '@/stores/taskStore';
+import { TaskBase } from '@/types/task';
 import { PriorityBadge } from './PriorityBadge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { MessageSquare } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface TaskCardProps {
-  task: Task;
+  task: TaskBase;
   onClick?: () => void;
   className?: string;
 }
 
 export function TaskCard({ task, onClick, className }: TaskCardProps) {
+  // Handle both task models by using an optional 'comments' array
+  const comments = 'comments' in task ? task.comments : [];
+  
   return (
     <div 
       className={cn(
@@ -31,7 +34,7 @@ export function TaskCard({ task, onClick, className }: TaskCardProps) {
       </div>
       
       <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-        {task.description}
+        {task.description || 'No description'}
       </p>
       
       <div className="flex items-center justify-between mt-auto">
@@ -49,10 +52,10 @@ export function TaskCard({ task, onClick, className }: TaskCardProps) {
             </div>
           )}
           
-          {task.comments.length > 0 && (
+          {comments.length > 0 && (
             <div className="flex items-center text-xs text-muted-foreground">
               <MessageSquare size={14} className="mr-1" />
-              {task.comments.length}
+              {comments.length}
             </div>
           )}
         </div>

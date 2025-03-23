@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { TaskStatus, Task } from '@/stores/typedTaskStore';
+import { Task } from '@/stores/typedTaskStore';
 import { TaskCard } from './TaskCard';
 
 interface ColumnProps {
   title: string;
-  status: TaskStatus;
+  status: string;
   tasks: Task[];
   onTaskClick: (task: Task) => void;
   onDragStart?: (e: React.DragEvent<HTMLDivElement>, task: Task) => void;

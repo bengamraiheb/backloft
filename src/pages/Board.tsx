@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
-import { useTaskStore } from '@/stores/typedTaskStore';
+import { useTaskStore, TaskStatus, TaskPriority } from '@/stores/typedTaskStore';
 import { useSocket } from '@/hooks/useSocket';
 import { Column } from '@/components/ui/Column';
 import { TaskDialog } from '@/components/dialogs/TaskDialog';
 import { Button } from '@/components/ui/button';
 import { Plus, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Task, TaskStatus } from '@/stores/typedTaskStore';
+import { Task } from '@/stores/typedTaskStore';
 
 export default function Board() {
   const { toast } = useToast();
@@ -93,7 +92,7 @@ export default function Board() {
   };
   
   const handleDrop = useCallback(
-    async (e: React.DragEvent<HTMLDivElement>, status: TaskStatus) => {
+    async (e: React.DragEvent<HTMLDivElement>, status: string) => {
       e.preventDefault();
       const taskId = e.dataTransfer.getData('taskId');
       

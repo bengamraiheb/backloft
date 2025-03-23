@@ -3,16 +3,25 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ArrowUp, ArrowDown, AlertCircle, ArrowUpDown } from 'lucide-react';
-import { TaskPriority } from '@/stores/taskStore';
+
+// Accept both uppercase and lowercase priority values
+type PriorityType = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | 'low' | 'medium' | 'high' | 'urgent' | string;
 
 interface PriorityBadgeProps {
-  priority: TaskPriority;
+  priority: PriorityType;
   className?: string;
   showLabel?: boolean;
 }
 
 export function PriorityBadge({ priority, className, showLabel = true }: PriorityBadgeProps) {
-  const priorityConfig = {
+  // Normalize priority to lowercase for consistent handling
+  const normalizedPriority = priority.toLowerCase();
+  
+  const priorityConfig: Record<string, {
+    color: string;
+    icon: React.ElementType;
+    label: string;
+  }> = {
     low: {
       color: 'bg-green-100 text-green-800 hover:bg-green-100',
       icon: ArrowDown,
@@ -35,7 +44,8 @@ export function PriorityBadge({ priority, className, showLabel = true }: Priorit
     },
   };
 
-  const config = priorityConfig[priority];
+  // Default to medium if priority is not recognized
+  const config = priorityConfig[normalizedPriority] || priorityConfig.medium;
   const Icon = config.icon;
 
   return (

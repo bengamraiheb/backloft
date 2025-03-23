@@ -8,8 +8,8 @@ export interface TaskBase {
   id: string;
   title: string;
   description?: string;  // Make description optional to match both interfaces
-  status: TaskStatus;
-  priority: TaskPriority;
+  status: string;
+  priority: string;
   assigneeId?: string | null;
   assignee?: {
     id: string;
